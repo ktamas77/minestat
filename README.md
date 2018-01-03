@@ -1,0 +1,2 @@
+# minestat
+MineStat
