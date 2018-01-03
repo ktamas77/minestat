@@ -1,0 +1,19 @@
+# --- Sample configuration for MineStats ---
+
+# Please copy this file into `config.yaml` and add your details below.
+
+# Mining pools definition. You can add multiple addresses of the same pool.
+
+pools:
+    ethermine:
+     - <wallet_address>
+     - <another wallet address>
+
+# Ethos Panel definition - you can define one stats panel
+
+ethos:
+    panel: <8 character panel name>
+    excluded_rigs:
+     - <8 character rig_id>
+     - <other 8 character rig_id>
+

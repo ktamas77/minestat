@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>MineStats</title>
+    <style>
+        body {
+            font-family: verdana, arial;
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    <?=sprintf("%.2f%%", $total_miner/$total_gpu*100)?>
+</h1>
+<h2>
+    <?=$total_miner?> / <?=$total_gpu?> GPUs
+</h2>
+<h2>
+    <?=$total_hash?> MH/S
+</h2>
+<h2>
+    <?=$max_temp?> ℃ max
+</h2>
+<h2>
+    <?=sprintf("$%.2f", $usd_per_month)?> / month
+</h2>
+<h2>
+    ETH: <?=sprintf("$%.2f", $eth_price)?>
+</h2>
+</body>
+</html>
