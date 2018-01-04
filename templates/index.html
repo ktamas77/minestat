@@ -98,7 +98,7 @@
         <?php if (isset($param) && $param === 'pay'): ?>
         <tr>
             <td class="data">
-                <u><?=sprintf("$%.2f", $usd_per_month + $sia_usd_per_month)?></u>
+                <u><?=sprintf("$%.2f", $usd_per_month + $sia_usd_per_month + $zclassic_usd_per_month)?></u>
             </td>
             <td class="text">
                 monthly
@@ -173,7 +173,6 @@
             </td>
         </tr>
         <tr>
-        <tr>
             <td class="data">
                 <?=sprintf("$%.2f", $zclassic_price)?>
             </td>
@@ -188,6 +187,16 @@
                 MH/S
             </td>
         </tr>
+        <?php if (isset($param) && $param === 'pay'): ?>
+        <tr>
+            <td class="data">
+                <u><?=sprintf("$%.2f", $zclassic_usd_per_month)?></u>
+            </td>
+            <td class="text">
+                monthly
+            </td>
+        </tr>
+        <?php endif ?>
     </table>
 </body>
 </html>

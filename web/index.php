@@ -157,10 +157,19 @@ function getMiningPoolHubCoinValues($config)
     $statData = array();
 
     $coins = $config['pools']['miningpoolhub']['coins'];
+    $apiKey = $config['pools']['miningpoolhub']['apikey'];
     foreach ($coins as $coin) {
         $coinMarketCapUrl = "https://api.coinmarketcap.com/v1/ticker/$coin/";
         $coinMarketCapData = json_decode(file_get_contents($coinMarketCapUrl), true);
-        $statData[$coin . "_price"] = $coinMarketCapData[0]['price_usd'];
+        $coinPrice = $coinMarketCapData[0]['price_usd'];
+        $statData[$coin . "_price"] = $coinPrice;
+
+        $miningPoolCoinStatsUrl = "https://$coin.miningpoolhub.com/index.php?page=api&action=getdashboarddata&api_key=$apiKey";
+        $miningPoolCoinStatsData = json_decode(file_get_contents($miningPoolCoinStatsUrl), true);
+        $dashboardData = $miningPoolCoinStatsData['getdashboarddata']['data'];
+        $recentCredits24H = $dashboardData['recent_credits_24hours']['amount'];
+
+        $statData[$coin . '_usd_per_month'] = $recentCredits24H * date('t') * $coinPrice;
     }
     return $statData;
 }
