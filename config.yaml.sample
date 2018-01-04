@@ -11,6 +11,11 @@ pools:
     nanopool-sia:
      - <sia_wallet_address>
      - <another_sia_wallet_address>
+    miningpoolhub:
+     apikey: <mining_pool_hub_api_key>
+     coins:
+      - <coin_name, example: 'zclassic'>
+      - <another_coin_name>
 
 # Ethos Panel definition - you can define one stats panel
 

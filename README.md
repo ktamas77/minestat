@@ -6,6 +6,7 @@ Simple statistics for your mining operations.
  * Ethos StatsPanel
  * Ethermine
  * Nanopool-Siacoin
+ * MiningPoolHub
 
 ### To install:
 * Please see `config.yaml.sample` for configuration details.

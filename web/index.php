@@ -36,6 +36,7 @@ function getStatData($config)
     $statData += getEthosData($config);
     $statData += getEthermineData($config);
     $statData += getNanopoolSiaData($config);
+    $statData += getMiningPoolHubCoinValues($config);
 
     return $statData;
 }
@@ -52,23 +53,36 @@ function getEthosData($config)
     $rigs = $ethosData['rigs'];
     $totalGpuNum = 0;
     $totalMinersNum = 0;
-    $totalHash = 0;
+    $totalEtHash = 0;
+    $totalEquiHash = 0;
     $maxTemp = 0;
     foreach ($rigs as $rigId => $rig) {
+        $etHash = 0;
+        $equiHash = 0;
         if (!in_array($rigId, $excludedRigs)) {
             $gpuNum = $rig['gpus'];
             $miners = $rig['miner_instance'];
-            $hash = $rig['hash'];
+
+            if (in_array($rig['miner'], array('claymore'))) {
+                $etHash = $rig['hash'];
+            }
+
+            if (in_array($rig['miner'], array('ewbf-zcash'))) {
+                $equiHash = $rig['hash'];
+            }
+
             $maxTemp = max(explode(' ', $rig['temp'] . ' ' . $maxTemp));
 
             $totalGpuNum += $gpuNum;
             $totalMinersNum += $miners;
-            $totalHash += $hash;
+            $totalEtHash += $etHash;
+            $totalEquiHash += $equiHash;
         }
     }
     $statData['total_gpu'] = $totalGpuNum;
     $statData['total_miner'] = $totalMinersNum;
-    $statData['total_hash'] = $totalHash;
+    $statData['total_ethash'] = $totalEtHash;
+    $statData['total_equihash'] = $totalEquiHash;
     $statData['max_temp'] = $maxTemp;
 
     return $statData;
@@ -135,5 +149,18 @@ function getNanopoolSiaData($config)
     $statData['sia_usd_per_month'] = $usdEarnings;
     $statData['sia_price'] = $siaPrice;
 
+    return $statData;
+}
+
+function getMiningPoolHubCoinValues($config)
+{
+    $statData = array();
+
+    $coins = $config['pools']['miningpoolhub']['coins'];
+    foreach ($coins as $coin) {
+        $coinMarketCapUrl = "https://api.coinmarketcap.com/v1/ticker/$coin/";
+        $coinMarketCapData = json_decode(file_get_contents($coinMarketCapUrl), true);
+        $statData[$coin . "_price"] = $coinMarketCapData[0]['price_usd'];
+    }
     return $statData;
 }
