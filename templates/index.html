@@ -1,6 +1,18 @@
+<?php
+    $percentage = (int)($total_miner/$total_gpu*128);
+    $red = 128-$percentage;
+    $green = $percentage;
+    $redColor = str_pad(dechex($red), 2, '0', STR_PAD_LEFT);
+    $greenColor = str_pad(dechex($green), 2, '0', STR_PAD_LEFT);
+    $alertLevelColor = $redColor . $greenColor . '00';
+?>
 <html>
 <head>
     <title>MineStats</title>
+    <?php if (isset($param) && $param === 'reload'): ?>
+        <meta http-equiv="refresh" content="60"/>
+    <?php endif ?>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
             font-family: verdana, arial;
@@ -12,15 +24,27 @@
         }
 
         h1 {
-            background-color: #000;
+            background-color: #<?=$alertLevelColor?>;
             color: #fff;
             padding: 4px;
+            text-align: center;
+            border: 0px;
+            border-bottom: 1px solid black;
         }
 
         table {
             font-family: verdana, arial;
             font-size: 20px;
             font-weight: bold;
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+            border: 0px;
+        }
+
+        .tableheader {
+            margin: 0px;
+            padding: 0px;
         }
 
         td {
@@ -47,12 +71,14 @@
     </style>
 </head>
 <body>
-<center>
-    <h1>
-        <?=sprintf("%.2f%%", $total_miner/$total_gpu*100)?>
-    </h1>
-
     <table>
+        <tr class="tableheader">
+            <td class="tableheader" colspan="2">
+                <h1>
+                    <?=sprintf("%.2f%%", $total_miner/$total_gpu*100)?>
+                </h1>
+            </td>
+        </tr>
         <tr>
             <td class="data">
                 <?=$total_miner?> / <?=$total_gpu?>
@@ -69,6 +95,7 @@
                 max temp
             </td>
         </tr>
+        <?php if (isset($param) && $param === 'pay'): ?>
         <tr>
             <td class="data">
                 <u><?=sprintf("$%.2f", $usd_per_month + $sia_usd_per_month)?></u>
@@ -77,6 +104,7 @@
                 monthly
             </td>
         </tr>
+        <?php endif ?>
         <tr>
             <td colspan="2">
                 <hr>
@@ -98,6 +126,7 @@
                 MH/S
             </td>
         </tr>
+        <?php if (isset($param) && $param === 'pay'): ?>
         <tr>
             <td class="data">
                 <u><?=sprintf("$%.2f", $usd_per_month)?></u>
@@ -106,6 +135,7 @@
                 monthly
             </td>
         </tr>
+        <?php endif ?>
         <tr>
             <td colspan="2">
                 <hr>
@@ -127,6 +157,7 @@
                 MH/S
             </td>
         </tr>
+        <?php if (isset($param) && $param === 'pay'): ?>
         <tr>
             <td class="data">
                 <u><?=sprintf("$%.2f", $sia_usd_per_month)?></u>
@@ -135,8 +166,7 @@
                 monthly
             </td>
         </tr>
+        <?php endif ?>
     </table>
-
-</center>
 </body>
 </html>

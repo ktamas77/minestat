@@ -18,9 +18,10 @@ $container['view'] = function ($container) {
     return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates/');
 };
 
-$app->get('/', function ($request, $response, $args) {
+$app->get('/[{param}]', function ($request, $response, $args) {
     global $config;
     $statData = getStatData($config);
+    $statData += $args;
     return $this->view->render($response, 'index.html', $statData);
 });
 
