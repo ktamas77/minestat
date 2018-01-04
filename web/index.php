@@ -28,7 +28,19 @@ $app->get('/', function ($request, $response, $args) {
 $app->run();
 
 // --- get details ---
-function getStatData($config) {
+function getStatData($config)
+{
+    $statData = array();
+
+    $statData += getEthosData($config);
+    $statData += getEthermineData($config);
+    $statData += getNanopoolSiaData($config);
+
+    return $statData;
+}
+
+function getEthosData($config)
+{
     $statData = array();
 
     // -- get ethos data ---
@@ -58,13 +70,19 @@ function getStatData($config) {
     $statData['total_hash'] = $totalHash;
     $statData['max_temp'] = $maxTemp;
 
+    return $statData;
+}
+
+function getEthermineData($config)
+{
+    $statData = array();
+
     // -- get ethermine data --
     $ethermineWallets = $config['pools']['ethermine'];
     $usdPerMin = 0;
     $unpaid = array();
     $minPayout = array();
-    foreach ($ethermineWallets as $ethermineWallet)
-    {
+    foreach ($ethermineWallets as $ethermineWallet) {
         $minerStatsUrl = "https://api.ethermine.org/miner/$ethermineWallet/currentStats";
         $etherMineData = json_decode(file_get_contents($minerStatsUrl), true);
         $data = $etherMineData['data'];
@@ -76,7 +94,7 @@ function getStatData($config) {
             $minPayout[$ethermineWallet] = $ethermineSettings['data']['minPayout'];
         }
     }
-    $usdPerMonth = $usdPerMin * 60 * 24 * 30;
+    $usdPerMonth = $usdPerMin * 60 * 24 * date('t');
     $statData['usd_per_month'] = $usdPerMonth;
     $statData['eth_unpaid'] = $unpaid;
     $statData['eth_min_payout'] = $minPayout;
@@ -85,6 +103,36 @@ function getStatData($config) {
     $poolStatsData = json_decode(file_get_contents($poolStatsUrl), true);
     $ethPrice = $poolStatsData['data']['price']['usd'];
     $statData['eth_price'] = $ethPrice;
+
+    return $statData;
+}
+
+function getNanopoolSiaData($config)
+{
+    $statData = array();
+
+    // -- get sia.nanopool data --
+    $nanopoolSiaWallets = $config['pools']['nanopool-sia'];
+
+    $totalHashRate = 0;
+    foreach ($nanopoolSiaWallets as $nanopoolSiaWallet) {
+        $nanopoolSiaUrl = "https://api.nanopool.org/v1/sia/hashrate/$nanopoolSiaWallet";
+        $nanopoolSiaData = json_decode(file_get_contents($nanopoolSiaUrl), true);
+        $hashRate = $nanopoolSiaData['data'];
+        $totalHashRate += $hashRate;
+    }
+
+    $nanopoolSiaCalculatorUrl = "https://api.nanopool.org/v1/sia/approximated_earnings/$totalHashRate";
+    $nanopoolSiaCalculatorData = json_decode(file_get_contents($nanopoolSiaCalculatorUrl), true);
+    $usdEarnings = $nanopoolSiaCalculatorData['data']['month']['dollars'];
+
+    $nanopoolSiaPriceUrl = "https://api.nanopool.org/v1/sia/prices";
+    $nanopoolSiaPriceData = json_decode(file_get_contents($nanopoolSiaPriceUrl), true);
+    $siaPrice = $nanopoolSiaPriceData['data']['price_usd'];
+
+    $statData['sia_hash'] = $totalHashRate;
+    $statData['sia_usd_per_month'] = $usdEarnings;
+    $statData['sia_price'] = $siaPrice;
 
     return $statData;
 }

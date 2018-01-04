@@ -5,29 +5,138 @@
         body {
             font-family: verdana, arial;
             text-align: center;
-            background-color: #333;
+            background-color: #444;
             color: #fff;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        h1 {
+            background-color: #000;
+            color: #fff;
+            padding: 4px;
+        }
+
+        table {
+            font-family: verdana, arial;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 4px;
+        }
+
+        td.data {
+            text-align: right;
+        }
+
+        td.text {
+            text-align: left;
+            font-weight: normal;
+            color: #aaa;
+        }
+
+        hr {
+            border-color: #666;
+        }
+        u {
+            text-decoration: none;
+            border-bottom: 2px solid #888;
         }
     </style>
 </head>
 <body>
-<h1>
-    <?=sprintf("%.2f%%", $total_miner/$total_gpu*100)?>
-</h1>
-<h2>
-    <?=$total_miner?> / <?=$total_gpu?> GPUs
-</h2>
-<h2>
-    <?=$total_hash?> MH/S
-</h2>
-<h2>
-    <?=$max_temp?> ℃ max
-</h2>
-<h2>
-    <?=sprintf("$%.2f", $usd_per_month)?> / month
-</h2>
-<h2>
-    ETH: <?=sprintf("$%.2f", $eth_price)?>
-</h2>
+<center>
+    <h1>
+        <?=sprintf("%.2f%%", $total_miner/$total_gpu*100)?>
+    </h1>
+
+    <table>
+        <tr>
+            <td class="data">
+                <?=$total_miner?> / <?=$total_gpu?>
+            </td>
+            <td class="text">
+                GPUs
+            </td>
+        </tr>
+        <tr>
+            <td class="data">
+                <?=$max_temp?>℃
+            </td>
+            <td class="text">
+                max temp
+            </td>
+        </tr>
+        <tr>
+            <td class="data">
+                <u><?=sprintf("$%.2f", $usd_per_month + $sia_usd_per_month)?></u>
+            </td>
+            <td class="text">
+                monthly
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td class="data">
+                <?=sprintf("$%.2f", $eth_price)?>
+            </td>
+            <td class="text">
+                ETH
+            </td>
+        </tr>
+        <tr>
+            <td class="data">
+                <?=$total_hash?>
+            </td>
+            <td class="text">
+                MH/S
+            </td>
+        </tr>
+        <tr>
+            <td class="data">
+                <u><?=sprintf("$%.2f", $usd_per_month)?></u>
+            </td>
+            <td class="text">
+                monthly
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td class="data">
+                <?=sprintf("$%.2f", $sia_price)?>
+            </td>
+            <td class="text">
+                SIA
+            </td>
+        </tr>
+        <tr>
+            <td class="data">
+                <?=$sia_hash?>
+            </td>
+            <td class="text">
+                MH/S
+            </td>
+        </tr>
+        <tr>
+            <td class="data">
+                <u><?=sprintf("$%.2f", $sia_usd_per_month)?></u>
+            </td>
+            <td class="text">
+                monthly
+            </td>
+        </tr>
+    </table>
+
+</center>
 </body>
 </html>
