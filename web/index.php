@@ -67,7 +67,7 @@ function getEthosData($config)
                 $etHash = $rig['hash'];
             }
 
-            if (in_array($rig['miner'], array('ewbf-zcash'))) {
+            if (in_array($rig['miner'], array('ewbf-zcash', 'dstm-zcash'))) {
                 $equiHash = $rig['hash'];
             }
 
