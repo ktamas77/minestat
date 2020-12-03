@@ -13,7 +13,7 @@ Simple statistics for your mining operations.
 * Run `composer update` to install required libraries
 
 ### Requirements:
-* Webserver (Apache/Nginx, etc) + PHP
+* PHP 7.0+
 
 Run local / dev:
 `composer start`
