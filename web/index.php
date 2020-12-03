@@ -1,5 +1,8 @@
 <?php
 
+use Slim\App;
+use Slim\Views\PhpRenderer;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $configFile = __DIR__ . '/../config.yaml';
@@ -12,10 +15,10 @@ if (!is_file($configFile)) {
 $configData = file_get_contents($configFile);
 $config = yaml_parse($configData);
 
-$app = new \Slim\App();
+$app = new App();
 $container = $app->getContainer();
 $container['view'] = function ($container) {
-    return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates/');
+    return new PhpRenderer(__DIR__ . '/../templates/');
 };
 
 $app->get('/[{param}]', function ($request, $response, $args) {
@@ -29,9 +32,9 @@ $app->get('/[{param}]', function ($request, $response, $args) {
 $app->run();
 
 // --- get details ---
-function getStatData($config)
+function getStatData($config): array
 {
-    $statData = array();
+    $statData = [];
 
     $statData += getEthosData($config);
     $statData += getEthermineData($config);
@@ -41,9 +44,9 @@ function getStatData($config)
     return $statData;
 }
 
-function getEthosData($config)
+function getEthosData($config): array
 {
-    $statData = array();
+    $statData = [];
 
     // -- get ethos data ---
     $ethosPanelId = $config['ethos']['panel'];
@@ -88,9 +91,9 @@ function getEthosData($config)
     return $statData;
 }
 
-function getEthermineData($config)
+function getEthermineData($config): array
 {
-    $statData = array();
+    $statData = [];
 
     // -- get ethermine data --
     $ethermineWallets = $config['pools']['ethermine'];
@@ -101,6 +104,9 @@ function getEthermineData($config)
         $minerStatsUrl = "https://api.ethermine.org/miner/$ethermineWallet/currentStats";
         $etherMineData = json_decode(file_get_contents($minerStatsUrl), true);
         $data = $etherMineData['data'];
+        if ($data === 'NO DATA') {
+            continue;
+        }
         if ($data['activeWorkers'] !== null) {
             $usdPerMin += $data['usdPerMin'];
             $unpaid[$ethermineWallet] = $data['unpaid'];
@@ -122,9 +128,9 @@ function getEthermineData($config)
     return $statData;
 }
 
-function getNanopoolSiaData($config)
+function getNanopoolSiaData($config): array
 {
-    $statData = array();
+    $statData = [];
 
     // -- get sia.nanopool data --
     $nanopoolSiaWallets = $config['pools']['nanopool-sia'];
@@ -132,18 +138,27 @@ function getNanopoolSiaData($config)
     $totalHashRate = 0;
     foreach ($nanopoolSiaWallets as $nanopoolSiaWallet) {
         $nanopoolSiaUrl = "https://api.nanopool.org/v1/sia/hashrate/$nanopoolSiaWallet";
-        $nanopoolSiaData = json_decode(file_get_contents($nanopoolSiaUrl), true);
+        $nanopoolSiaData = @json_decode(file_get_contents($nanopoolSiaUrl), true);
+        if ($nanopoolSiaData === null) {
+            continue;
+        }
         $hashRate = $nanopoolSiaData['data'];
         $totalHashRate += $hashRate;
     }
 
+    $usdEarnings = 'n/a';
     $nanopoolSiaCalculatorUrl = "https://api.nanopool.org/v1/sia/approximated_earnings/$totalHashRate";
-    $nanopoolSiaCalculatorData = json_decode(file_get_contents($nanopoolSiaCalculatorUrl), true);
-    $usdEarnings = $nanopoolSiaCalculatorData['data']['month']['dollars'];
+    $nanopoolSiaCalculatorData = @json_decode(file_get_contents($nanopoolSiaCalculatorUrl), true);
+    if ($nanopoolSiaCalculatorData !== null) {
+        $usdEarnings = $nanopoolSiaCalculatorData['data']['month']['dollars'];
+    }
 
+    $siaPrice = 'n/a';
     $nanopoolSiaPriceUrl = "https://api.nanopool.org/v1/sia/prices";
-    $nanopoolSiaPriceData = json_decode(file_get_contents($nanopoolSiaPriceUrl), true);
-    $siaPrice = $nanopoolSiaPriceData['data']['price_usd'];
+    $nanopoolSiaPriceData = @json_decode(file_get_contents($nanopoolSiaPriceUrl), true);
+    if ($nanopoolSiaPriceData !== null) {
+        $siaPrice = $nanopoolSiaPriceData['data']['price_usd'];
+    }
 
     $statData['sia_hash'] = $totalHashRate;
     $statData['sia_usd_per_month'] = $usdEarnings;
@@ -152,22 +167,27 @@ function getNanopoolSiaData($config)
     return $statData;
 }
 
-function getMiningPoolHubCoinValues($config)
+function getMiningPoolHubCoinValues($config): array
 {
-    $statData = array();
+    $statData = [];
 
     $coins = $config['pools']['miningpoolhub']['coins'];
     $apiKey = $config['pools']['miningpoolhub']['apikey'];
     foreach ($coins as $coin) {
         $coinMarketCapUrl = "https://api.coinmarketcap.com/v1/ticker/$coin/";
-        $coinMarketCapData = json_decode(file_get_contents($coinMarketCapUrl), true);
-        $coinPrice = $coinMarketCapData[0]['price_usd'];
-        $statData[$coin . "_price"] = $coinPrice;
+        $coinMarketCapData = @json_decode(file_get_contents($coinMarketCapUrl), true);
+        $coinPrice = 0;
+        if ($coinMarketCapData !== null) {
+            $coinPrice = $coinMarketCapData[0]['price_usd'];
+            $statData[$coin . "_price"] = $coinPrice;
+        }
 
         $miningPoolCoinStatsUrl = "https://$coin.miningpoolhub.com/index.php?page=api&action=getdashboarddata&api_key=$apiKey";
-        $miningPoolCoinStatsData = json_decode(file_get_contents($miningPoolCoinStatsUrl), true);
-        $dashboardData = $miningPoolCoinStatsData['getdashboarddata']['data'];
-        $recentCredits24H = $dashboardData['recent_credits_24hours']['amount'];
+        $miningPoolCoinStatsData = @json_decode(file_get_contents($miningPoolCoinStatsUrl), true);
+        if ($miningPoolCoinStatsData !== null) {
+            $dashboardData = $miningPoolCoinStatsData['getdashboarddata']['data'];
+            $recentCredits24H = $dashboardData['recent_credits_24hours']['amount'];
+        }
 
         $statData[$coin . '_usd_per_month'] = $recentCredits24H * date('t') * $coinPrice;
     }

@@ -174,7 +174,7 @@
         </tr>
         <tr>
             <td class="data">
-                <?=sprintf("$%.2f", $zclassic_price)?>
+                <?=@sprintf("$%.2f", $zclassic_price)?>
             </td>
             <td class="text">
                 ZCL
@@ -190,7 +190,7 @@
         <?php if (isset($param) && $param === 'pay'): ?>
         <tr>
             <td class="data">
-                <u><?=sprintf("$%.2f", $zclassic_usd_per_month)?></u>
+                <u><?=@sprintf("$%.2f", $zclassic_usd_per_month)?></u>
             </td>
             <td class="text">
                 monthly

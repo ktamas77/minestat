@@ -1,4 +1,12 @@
 {
+    "config": {
+        "platform": {
+            "php": "7.0"
+        }
+    },
+    "scripts": {
+        "start": "php -S localhost:8080 -t web"
+    },
     "require": {
         "slim/slim": "^3.9",
         "slim/php-view": "^2.2"

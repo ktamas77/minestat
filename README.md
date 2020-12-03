@@ -16,7 +16,7 @@ Simple statistics for your mining operations.
 * Webserver (Apache/Nginx, etc) + PHP
 
 Run local / dev:
-* `php -S localhost:8080 -t web`
+`composer start`
 
 ### Usage:
 
